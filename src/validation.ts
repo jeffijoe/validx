@@ -235,9 +235,9 @@ export class ValidationContext implements IValidationContext {
   }
 }
 
-export function validationContext (): IValidationContext
-export function validationContext <T>(objectToValidate: T): IBoundValidationContext<T>
 export function validationContext <T>(objectToValidate: T, schema: IValidationSchema<T>): ISchemaBoundValidationContext
+export function validationContext <T>(objectToValidate: T): IBoundValidationContext<T>
+export function validationContext (): IValidationContext
 export function validationContext <T>(
   objectToValidate?: any,
   schema?: IValidationSchema<T>
