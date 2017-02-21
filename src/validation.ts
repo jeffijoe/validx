@@ -71,7 +71,7 @@ export interface IValidationContext {
   isValid: boolean
   reset (): this
   validate <T>(obj: T, schema: IValidationSchema<T>): this
-  addErrors (errors: IValidationErrors): this
+  addErrors (errors: IValidationErrors | { [key: string]: string[] }): this
 }
 
 /**
