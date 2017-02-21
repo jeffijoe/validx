@@ -9,7 +9,7 @@
 [![npm](https://img.shields.io/npm/l/validx.svg?maxAge=1000)](https://github.com/jeffijoe/validx/blob/master/LICENSE.md)
 [![node](https://img.shields.io/node/v/validx.svg?maxAge=1000)](https://www.npmjs.com/package/validx)
 
-Validation library using MobX.
+Validation library with [MobX](https://github.com/mobxjs/mobx).
 
 ## Install
 
@@ -22,8 +22,8 @@ npm install --save validx
 We want to reactively display validation issues in our UI when using MobX. You can use
 any (non-DOM) validation library, but then you still need to make it reactive.
 
-**ValidX** is built for MobX and is easy to use, yet powerful enough to add any validation
-you'd like.
+**ValidX** is built for [MobX](https://github.com/mobxjs/mobx) and is easy to use, yet
+powerful enough to add any validation you'd like.
 
 # Examples
 
@@ -90,9 +90,13 @@ validation.validate({
   name: '',
   email: ''
 }, schema)
+```
 
-// Now that we have validated our object, we can pull the errors
-// from the context.
+
+Now that we have validated our object, we can pull the errors
+from the context.
+
+```js
 console.log(validation.isValid) 
 // false
 
@@ -101,8 +105,11 @@ console.log(validation.errors.name)
 
 console.log(validation.errors.email)
 // ['Email is required', 'Not a valid email']
+```
 
-// To validate again, we need to reset the context and then validate.
+To validate again, we need to reset the context and then validate.
+
+```js
 validation.reset().validate({
   name: 'Jeff',
   email: 'test'
@@ -116,9 +123,12 @@ console.log(validation.errors.name)
 
 console.log(validation.errors.email)
 // ['Not a valid email']
+```
 
-// Let's see what the errors are like when we
-// log them after resetting.
+Let's see what the errors are like when we
+log them after resetting.
+
+```js
 validation.reset()
 console.log(validation.isValid)
 // true
@@ -127,10 +137,12 @@ console.log(validation.errors.name)
 
 console.log(validation.errors.email)
 // undefined
+```
 
-// They are undefined because we don't know
-// what fields will be validated yet.
+They are undefined because we don't know
+what fields will be validated yet.
 
+```js
 validation.validate({
   name: 'Jeff',
   email: 'test'
