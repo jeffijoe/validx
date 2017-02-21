@@ -57,7 +57,7 @@ export type IValidationSchema<T> = {
  * @interface IValidationErrors
  */
 export interface IValidationErrors {
-  [key: string]: IObservableArray<string>[]
+  [key: string]: IObservableArray<string>
 }
 
 /**
