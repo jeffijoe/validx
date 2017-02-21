@@ -9,7 +9,7 @@
 [![npm](https://img.shields.io/npm/l/validx.svg?maxAge=1000)](https://github.com/jeffijoe/validx/blob/master/LICENSE.md)
 [![node](https://img.shields.io/node/v/validx.svg?maxAge=1000)](https://www.npmjs.com/package/validx)
 
-Validation library with [MobX](https://github.com/mobxjs/mobx).
+Validation library for [MobX](https://github.com/mobxjs/mobx).
 
 ## Install
 
