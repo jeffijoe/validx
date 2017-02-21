@@ -1,104 +1,90 @@
-/**
- * This example illustrates full usage of LibX, how it ensures we only
- * have a single source of truth for our data by using stores and collections of models.
- */
+import { validationContext, required, pattern } from '../../../lib'
+import { action, autorun } from 'mobx'
+import { inspect } from 'util'
 
-import { Store, Model, createRootStore } from '../../../lib'
-import { observable } from 'mobx'
-import assert from 'assert'
-import moment from 'moment'
-import { API } from './api'
+// Does not have to be an observable,
+// so to demonstrate I'll use a plain object.
+const obj = {
+}
 
-// ---------------------------
-// Todos
-// ---------------------------
-
-// One part of the magic puzzle is "Models".
-// It gives us a way to transform dumb JSON (JS objects) to a meaningful model.
-class Todo extends Model {
-  @observable text
-  @observable completed = false
-  @observable creator
-  @observable createdAt
-
-  // Override `parse` to customize how we transform external JSON to
-  // properties for this model.
-  parse (json) {
-    // We have a separate store for users, so
-    // we set it there.
-    const creator = this.rootStore.userStore.users.set(json.creator)
-    return {
-      ...json,
-      // We want our dates as moments.
-      createdAt: moment(json.createdAt),
-      creator
+// First parameter is the object to validate, second
+// is the validation schema.
+const validation = validationContext(obj, {
+  name: [
+    required({ msg: 'Name is required' })
+  ],
+  email: [
+    required('Email is required'), // shorthand message parameter for the required validator.
+    pattern({ pattern: 'email', msg: 'That is not a valid email' })
+  ],
+  age: [
+    required('Age is required'),
+    pattern({
+      pattern: /\d/, // regex pattern for numbers
+      msg: 'Age must be a number'
+    }),
+    // And a custom validator.
+    (opts) => {
+      // Validators return either true for success, and false (for the default error message)
+      // or a string (for a custom error message)
+      return opts.value >= 13 || 'You must be over 13 years of age to sign up.'
     }
-  }
-}
-
-class TodoStore extends Store {
-  todos = this.collection({ model: Todo })
-
-  fetchTodos () {
-    // Fetch the todos, then load them into the collection.
-    return API.getTodos()
-      .then(todos => this.todos.set(todos))
-  }
-}
-
-// ---------------------------
-// Users
-// ---------------------------
-class User extends Model {
-  @observable name
-  @observable twitterHandle
-}
-
-class UserStore extends Store {
-  users = this.collection({
-    model: User,
-    idAttribute: '_id' // just to demo how we actually use the ID.
-  })
-
-  fetchUser (id) {
-    return API.getUser(id).then(this.users.set)
-  }
-}
-
-// ---------------------------
-// Root store - aka the glue.
-// See the TypeScript example for a different approach.
-// ---------------------------
-const root = createRootStore({
-  todoStore: TodoStore,
-  userStore: UserStore
+  ]
 })
 
-// ---------------------------
-// Lets go!
-// ---------------------------
-
-const { todoStore, userStore } = root
-
-todoStore.fetchTodos().then(todos => {
-  const [todo] = todos
-  assert(todos.length === 3)
-  assert(todo instanceof Todo)
-  // Even though we had 3 todos and each item included their creator,
-  // we only see 2 users because they had the same ID.
-  assert(userStore.users.length === 2)
-  assert(todo.creator instanceof User)
-  assert(todo.creator._id === 1)
-  assert(todo.creator.twitterHandle === undefined) // we don't have this yet.
-
-  return userStore.fetchUser(1).then((user) => {
-    assert(user === todo.creator) // Same instance, woah!
-    assert(user.twitterHandle === 'mweststrate')
-
-    console.log('Todo:', todo.text)
-    console.log('Todo created', todo.createdAt.fromNow())
-    console.log('Todo creator twitter handle:', todo.creator.twitterHandle)
-    console.log('-------------')
-    console.log('So long, and thanks for all the fish!')
+// Let's set up an autorun that will log whenever
+// our validation state changes.
+// Keep in mind the first output will say all is well,
+// but thats because we didnt start validating yet.
+autorun(() => {
+  console.log('')
+  console.log('')
+  console.log('-------- Validation Summary ---------')
+  console.log('Bad field count: ', Object.keys(validation.errors).length)
+  Object.keys(validation.errors).map(key => {
+    // errors[key] is an observable array.
+    // using slice to print them nicely in the console.
+    console.log(
+      `Errors for ${key}: `,
+      // Add some color to the console output. :)
+      inspect(validation.errors[key].slice(), { colors: true })
+    )
   })
+  console.log('-- So is it valid?', validation.isValid ? 'Yes it is!' : 'Hell naw!')
 })
+
+// The context needs to be reset every time we validate
+// from scratch. See the docs as to why this is useful.
+// Wrap it in an action so we batch the resetting and validating.
+const validate = action(() => validation.reset().validate())
+
+// First round
+validation.validate()
+
+// Let's add our name.
+obj.name = 'Jeff'
+
+// We need to validate again.
+validate()
+
+// Add an email, except it's not really an email..
+obj.email = 'test'
+validate()
+
+// Much better!
+obj.email = 'test@test.com'
+validate()
+
+// Alright now the age..
+obj.age = 'twentytwo'
+validate()
+
+// Oh, it has to be a number.
+obj.age = 2
+validate()
+
+// Woops, forgot a digit.
+obj.age = 22
+validate()
+
+// And we're good!

@@ -1,114 +1,96 @@
-/**
- * This example illustrates how we can achieve type safety with TS.
- * See the Babel example for an explanation of the example itself.
- */
+import { validationContext, required, pattern, IValidatorOptions } from '../../../lib'
+import { action, autorun } from 'mobx'
+import { inspect } from 'util'
 
-import { Store, Model as BaseModel } from '../../../lib'
-import { observable } from 'mobx'
-import * as assert from 'assert'
-import * as moment from 'moment'
-import { API } from './api'
-
-// Only needed in TS to get proper root store typing.
-class Model extends BaseModel {
-  rootStore: RootStore
+interface IObj {
+  name?: string
+  email?: string
+  age?: number
 }
 
-// ---------------------------
-// Todos
-// ---------------------------
-class Todo extends Model {
-  @observable text: string
-  @observable completed: boolean = false
-  @observable creator: User
-  @observable createdAt: moment.Moment
+// Does not have to be an observable,
+// so to demonstrate I'll use a plain object.
+const obj: IObj = {
+}
 
-  // Override `parse` to customize how we transform external JSON to
-  // properties for this model.
-  parse (json: any) {
-    // We have a separate store for users, so
-    // we set it there.
-    const creator = this.rootStore.userStore.users.set(json.creator)
-    return {
-      ...json,
-      createdAt: moment(json.createdAt),
-      creator
+// First parameter is the object to validate, second
+// is the validation schema.
+const validation = validationContext(obj, {
+  name: [
+    required({ msg: 'Name is required' })
+  ],
+  email: [
+    required('Email is required'), // shorthand message parameter for the required validator.
+    pattern({ pattern: 'email', msg: 'That is not a valid email' })
+  ],
+  age: [
+    required('Age is required'),
+    pattern({
+      pattern: /\d/, // regex pattern for numbers
+      msg: 'Age must be a number'
+    }),
+    // And a custom validator.
+    (opts: IValidatorOptions<IObj>) => {
+      // Validators return either true for success, and false (for the default error message)
+      // or a string (for a custom error message)
+      return opts.value >= 13 || 'You must be over 13 years of age to sign up.'
     }
-  }
-}
-
-class TodoStore extends Store {
-  todos = this.collection<Todo>({ model: Todo })
-
-  fetchTodos () {
-    // Fetch the todos, then load them into the collection.
-    return API.getTodos()
-      .then(this.todos.set)
-  }
-}
-
-// ---------------------------
-// Users
-// ---------------------------
-class User extends Model {
-  _id: number
-  @observable name: string
-  @observable twitterHandle: string
-}
-
-class UserStore extends Store {
-  users = this.collection<User>({
-    model: User,
-    idAttribute: '_id' // just to demo.
-  })
-
-  fetchUser (id: number) {
-    return API.getUser(id).then(this.users.set)
-  }
-}
-
-// ---------------------------
-// Root store - aka the glue.
-// See the Babel example for a different approach.
-// ---------------------------
-class RootStore {
-  todoStore: TodoStore
-  userStore: UserStore
-
-  constructor () {
-    const makeOpts = () => ({ rootStore: this })
-
-    this.todoStore = new TodoStore(makeOpts())
-    this.userStore = new UserStore(makeOpts())
-  }
-}
-
-// ---------------------------
-// Lets go!
-// ---------------------------
-const root = new RootStore()
-
-const { todoStore, userStore } = root
-
-todoStore.fetchTodos().then(todos => {
-  const [todo] = todos
-  assert(todos.length === 3)
-  assert(todo instanceof Todo)
-  // Even though we had 3 todos and each item included their creator,
-  // we only see 2 users because they had the same ID.
-  assert(userStore.users.length === 2)
-  assert(todo.creator instanceof User)
-  assert(todo.creator._id === 1)
-  assert(todo.creator.twitterHandle === undefined) // we don't have this yet.
-
-  return userStore.fetchUser(1).then((user) => {
-    assert(user === todo.creator) // Same instance, woah!
-    assert(user.twitterHandle === 'mweststrate')
-
-    console.log('Todo:', todo.text)
-    console.log('Todo created', todo.createdAt.fromNow())
-    console.log('Todo creator twitter handle:', todo.creator.twitterHandle)
-    console.log('-------------')
-    console.log('So long, and thanks for all the fish!')
-  })
+  ]
 })
+
+// Let's set up an autorun that will log whenever
+// our validation state changes.
+// Keep in mind the first output will say all is well,
+// but thats because we didnt start validating yet.
+autorun(() => {
+  console.log('')
+  console.log('')
+  console.log('-------- Validation Summary ---------')
+  console.log('Bad field count: ', Object.keys(validation.errors).length)
+  Object.keys(validation.errors).map(key => {
+    // errors[key] is an observable array.
+    // using slice to print them nicely in the console.
+    console.log(
+      `Errors for ${key}: `,
+      // Add some color to the console output. :)
+      inspect(validation.errors[key].slice(), { colors: true })
+    )
+  })
+  console.log('-- So is it valid?', validation.isValid ? 'Yes it is!' : 'Hell naw!')
+})
+
+// The context needs to be reset every time we validate
+// from scratch. See the docs as to why this is useful.
+// Wrap it in an action so we batch the resetting and validating.
+const validate = action(() => validation.reset().validate())
+
+// First round
+validation.validate()
+
+// Let's add our name.
+obj.name = 'Jeff'
+
+// We need to validate again.
+validate()
+
+// Add an email, except it's not really an email..
+obj.email = 'test'
+validate()
+
+// Much better!
+obj.email = 'test@test.com'
+validate()
+
+// Alright now the age..
+obj.age = 'twentytwo' as any // trick TS
+validate()
+
+// Oh, it has to be a number.
+obj.age = 2
+validate()
+
+// Woops, forgot a digit.
+obj.age = 22
+validate()
+
+// And we're good!

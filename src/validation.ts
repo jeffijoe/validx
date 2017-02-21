@@ -1,4 +1,4 @@
-import { observable, extendObservable, action, computed, ObservableMap } from 'mobx'
+import { observable, extendObservable, action, computed, ObservableMap, IObservableArray } from 'mobx'
 const every = require('lodash/every')
 const forEach = require('lodash/forEach')
 
@@ -57,7 +57,7 @@ export type IValidationSchema<T> = {
  * @interface IValidationErrors
  */
 export interface IValidationErrors {
-  [key: string]: string[]
+  [key: string]: IObservableArray<string>[]
 }
 
 /**
@@ -193,7 +193,7 @@ export class ValidationContext implements IValidationContext {
   /**
    * Adds errors to the context.
    */
-  addErrors (errors: IValidationErrors) {
+  addErrors (errors: IValidationErrors | { [key: string]: string[] }) {
     forEach(errors, (arr: string[], field: string) => {
       this.ensureErrors(field).push(...arr)
     })
@@ -243,7 +243,7 @@ export function validationContext <T>(
   schema?: IValidationSchema<T>
 ): IValidationContext | IBoundValidationContext<T> | ISchemaBoundValidationContext {
   const v = new ValidationContext()
-  if (objectToValidate) {
+  if (objectToValidate !== null && objectToValidate !== undefined) {
     if (schema) {
       v.validate = v.validate.bind(v, objectToValidate, schema)
     } else {
