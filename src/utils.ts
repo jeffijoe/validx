@@ -7,7 +7,7 @@ export type Iteratee<V, K, O, R> = (value: V, key: K, source: O) => R
  */
 function arrayEach<T> (array: T[], iteratee: Iteratee<T, number, T[], any>): T[] {
   let index = -1
-  const length = array == null ? 0 : array.length
+  const length = array.length
 
   while (++index < length) {
     if (iteratee(array[index], index, array) === false) {
@@ -22,6 +22,7 @@ function arrayEach<T> (array: T[], iteratee: Iteratee<T, number, T[], any>): T[]
  */
 function objectEach<T> (source: T, iteratee: Iteratee<any, string, T, any>): T {
   for (let key in source) {
+    /* istanbul ignore next */
     if (source.hasOwnProperty(key)) {
       if (iteratee(source[key], key, source) === false) {
         break
