@@ -54,7 +54,7 @@ The properties on the context are reactive (observables/computeds powered by Mob
 Given an object and a schema, validates the object and returns itself.
 `validate()` is a MobX `action`.
 
-Calling it will populate the `errors` property with any validation errors 
+Calling it will populate the `errors` property with any validation errors
 found on the object
 
 There are multiple ways to use `validate()`, see [Bound ValidationContext](#bound-validationcontext).
@@ -97,7 +97,7 @@ Now that we have validated our object, we can pull the errors
 from the context.
 
 ```js
-console.log(validation.isValid) 
+console.log(validation.isValid)
 // false
 
 console.log(validation.errors.name)
@@ -115,7 +115,7 @@ validation.reset().validate({
   email: 'test'
 }, schema)
 
-console.log(validation.isValid) 
+console.log(validation.isValid)
 // false
 
 console.log(validation.errors.name)
@@ -148,7 +148,7 @@ validation.validate({
   email: 'test'
 }, schema)
 
-console.log(validation.isValid) 
+console.log(validation.isValid)
 // false
 
 console.log(validation.errors.name)
@@ -160,7 +160,7 @@ console.log(validation.errors.email)
 
 ### `reset()`
 
-Resets the internal state of the context. You usually use this before 
+Resets the internal state of the context. You usually use this before
 starting a new validation. `reset()` is a MobX `action`.
 
 ```js
@@ -180,9 +180,9 @@ console.log(validation.errors.name)
 ```js
 class Element {
   @observable label = ''
-  
+
   validation = validationContext(this)
-  
+
   @action validate () {
     this.validation.validate({
       label: [required({ msg: 'Label required' })]
@@ -192,7 +192,7 @@ class Element {
 
 class TextElement extends Element {
   @observable placeholder = ''
-  
+
   @action validate () {
     // reset before caling super
     this.validation.reset().validate({
@@ -369,6 +369,7 @@ validation.validate()
 
 - Added `validation.getErrors()`
 - Added `validation.getError()`
+- Removed `lodash` dependency
 
 ## v0.0.4
 
