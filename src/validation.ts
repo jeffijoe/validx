@@ -1,6 +1,5 @@
 import { observable, extendObservable, action, computed, ObservableMap, IObservableArray } from 'mobx'
-const every = require('lodash/every')
-const forEach = require('lodash/forEach')
+import { forEach, every } from './utils'
 
 /**
  * Options passed to validators.
@@ -70,7 +69,7 @@ export interface IValidationContext {
   errors: IValidationErrors
   isValid: boolean
   reset (): this
-  validate <T>(obj: T, schema: IValidationSchema<T>): this
+  validate<T> (obj: T, schema: IValidationSchema<T>): this
   addErrors (errors: IValidationErrors | { [key: string]: string[] }): this
   getErrors (field: string): string[]
   getError (field: string): string | undefined
@@ -101,33 +100,6 @@ export interface ISchemaBoundValidationContext<T> extends IBoundValidationContex
  */
 export class ValidationContext implements IValidationContext {
   /**
-   * Initializes a new instance of ValidationContext.
-   */
-  constructor () {
-    this.reset = action.bound(this.reset)
-    this.addErrors = action.bound(this.addErrors)
-    this.validate = action.bound(this.validate)
-    extendObservable(this, {
-      errorsMap: observable.map<string[]>(),
-      errors: computed(() => {
-        return this.errorsMap.toJS()
-      }),
-      isValid: computed(() => {
-        return every(this.errors, (arr: string[]) => arr.length === 0)
-      })
-    })
-  }
-
-  /**
-   * Internal map of the errors.
-   *
-   * @private
-   *
-   * @memberOf ValidationContext
-   */
-  private errorsMap: ObservableMap<string[]>
-
-  /**
    * All validation errors are stored here. To clear, call `reset`.
    *
    * @readonly
@@ -144,6 +116,33 @@ export class ValidationContext implements IValidationContext {
    * @memberOf ValidationContext
    */
   readonly isValid: boolean
+
+  /**
+   * Internal map of the errors.
+   *
+   * @private
+   *
+   * @memberOf ValidationContext
+   */
+  private errorsMap: ObservableMap<string[]>
+
+  /**
+   * Initializes a new instance of ValidationContext.
+   */
+  constructor () {
+    this.reset = action.bound(this.reset)
+    this.addErrors = action.bound(this.addErrors)
+    this.validate = action.bound(this.validate)
+    extendObservable(this, {
+      errorsMap: observable.map<string[]>(),
+      errors: computed(() => {
+        return this.errorsMap.toJS()
+      }),
+      isValid: computed(() => {
+        return every(this.errors, (arr: string[]) => arr.length === 0)
+      })
+    })
+  }
 
   /**
    * Resets the errors.
@@ -168,7 +167,7 @@ export class ValidationContext implements IValidationContext {
    *
    * @memberOf ValidationContext
    */
-  validate <T>(obj: T, schema: IValidationSchema<T>): this {
+  validate<T> (obj: T, schema: IValidationSchema<T>): this {
     forEach(schema, (validators: Array<IValidator<T>>, field: string) => {
       const errors = this.ensureErrors(field)
       const value = (obj as any)[field]
@@ -203,7 +202,7 @@ export class ValidationContext implements IValidationContext {
     })
     return this
   }
-  
+
   /**
    * Gets the errors for the given field.
    */
@@ -212,10 +211,10 @@ export class ValidationContext implements IValidationContext {
     if (!errors) {
       return []
     }
-    
+
     return errors.slice()
   }
-  
+
   /**
    * Gets the first error for the given field.
    * If not found, returns undefined.
@@ -259,10 +258,10 @@ export class ValidationContext implements IValidationContext {
   }
 }
 
-export function validationContext <T>(objectToValidate: T, schema: IValidationSchema<T>): ISchemaBoundValidationContext<T>
-export function validationContext <T>(objectToValidate: T): IBoundValidationContext<T>
+export function validationContext<T> (objectToValidate: T, schema: IValidationSchema<T>): ISchemaBoundValidationContext<T>
+export function validationContext<T> (objectToValidate: T): IBoundValidationContext<T>
 export function validationContext (): IValidationContext
-export function validationContext <T>(
+export function validationContext<T> (
   objectToValidate?: any,
   schema?: IValidationSchema<T>
 ): IValidationContext | IBoundValidationContext<T> | ISchemaBoundValidationContext<T> {

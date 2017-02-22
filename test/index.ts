@@ -1,4 +1,4 @@
 import 'mocha'
 
-const chaii = require('chai')
-chaii.use(require('sinon-chai'))
+const chai = require('chai')
+chai.use(require('sinon-chai'))

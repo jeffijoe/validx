@@ -107,7 +107,7 @@ console.log(validation.errors.email)
 // ['Email is required', 'Not a valid email']
 ```
 
-To validate again, we need to reset the context and then validate.
+To validate again, we need to reset the context and then call validate.
 
 ```js
 validation.reset().validate({
@@ -233,6 +233,40 @@ console.log(validation.errors.username)
 // ['Username is taken']
 ```
 
+## `getErrors()`
+
+Safer way to get errors for a field rather than using `errors.field`,
+as this will return an empty array in case there are no errors.
+
+```js
+const validation = validationContext()
+validation.addErrors({ name: ['Not cool'] })
+
+validation.getErrors('name')
+// ['Not cool']
+
+validation.reset()
+validation.getErrors('name')
+// []
+```
+
+## `getError()`
+
+Convenience method for `getErrors('field')[0]`.
+Returns `undefined` if the error is not found.
+
+```js
+const validation = validationContext()
+validation.addErrors({ name: ['Not cool'] })
+
+validation.getError('name')
+// 'Not cool'
+
+validation.reset()
+validation.getError('name')
+// undefined
+```
+
 ## `errors`
 
 A MobX `computed` map of field -> errors. When `validate` discovers validation errors, it
@@ -328,6 +362,17 @@ const validation = validationContext(obj, {
 
 validation.validate()
 ```
+
+# Changelog
+
+## v0.1.0
+
+- Added `validation.getErrors()`
+- Added `validation.getError()`
+
+## v0.0.4
+
+- First official release.
 
 # Author
 
