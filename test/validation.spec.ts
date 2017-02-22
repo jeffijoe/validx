@@ -120,6 +120,48 @@ describe('ValidationContext', () => {
       expect(reactionSpy.callCount).to.equal(2, 'should have reacted 2 times')
     })
   })
+  
+  describe('#getErrors', () => {
+    it('returns the errors for the given field', () => {
+      const c = validationContext()
+      c.addErrors({ test: ['Hello', 'World'] })
+      expect(c.getErrors('test')).to.deep.equal(['Hello', 'World'])
+    })
+    
+    it('returns an empty array for the given field if there are no errors', () => {
+      const c = validationContext()
+      expect(c.getErrors('test')).to.deep.equal([])
+    })
+    
+    it('supports bound contexts', () => {
+      const c = validationContext({ name: '' }, {
+        name: [required()]
+      })
+      c.reset().validate()
+      expect(c.getErrors('name')[0]).to.match(/required/)
+    })
+  })
+  
+  describe('#getError', () => {
+    it('returns the first error for the given field', () => {
+      const c = validationContext()
+      c.addErrors({ test: ['Hello', 'World'] })
+      expect(c.getError('test')).to.deep.equal('Hello')
+    })
+    
+    it('returns an empty array for the given field if there are no errors', () => {
+      const c = validationContext()
+      expect(c.getError('test')).to.deep.equal(undefined)
+    })
+    
+    it('supports bound contexts', () => {
+      const c = validationContext({ name: '' }, {
+        name: [required('hah'), pattern({ pattern: 'email' })]
+      })
+      c.reset().validate()
+      expect(c.getError('name')).to.equal('hah')
+    })
+  })
 
   describe('validators', () => {
     describe('regular function', () => {

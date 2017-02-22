@@ -72,6 +72,8 @@ export interface IValidationContext {
   reset (): this
   validate <T>(obj: T, schema: IValidationSchema<T>): this
   addErrors (errors: IValidationErrors | { [key: string]: string[] }): this
+  getErrors (field: string): string[]
+  getError (field: string): string | undefined
 }
 
 /**
@@ -79,12 +81,14 @@ export interface IValidationContext {
  */
 export interface IBoundValidationContext<T> extends IValidationContext {
   validate (schema: IValidationSchema<T>): this
+  getErrors (field: keyof T): string[]
+  getError (field: keyof T): string | undefined
 }
 
 /**
  * Validation context with the object already bound to the validate function.
  */
-export interface ISchemaBoundValidationContext extends IValidationContext {
+export interface ISchemaBoundValidationContext<T> extends IBoundValidationContext<T> {
   validate (): this
 }
 
@@ -199,6 +203,26 @@ export class ValidationContext implements IValidationContext {
     })
     return this
   }
+  
+  /**
+   * Gets the errors for the given field.
+   */
+  getErrors (field: string) {
+    const errors = this.errors[field]
+    if (!errors) {
+      return []
+    }
+    
+    return errors.slice()
+  }
+  
+  /**
+   * Gets the first error for the given field.
+   * If not found, returns undefined.
+   */
+  getError (field: string) {
+    return this.getErrors(field)[0]
+  }
 
   /**
    * Ensures that an entry in the internal error map
@@ -235,13 +259,13 @@ export class ValidationContext implements IValidationContext {
   }
 }
 
-export function validationContext <T>(objectToValidate: T, schema: IValidationSchema<T>): ISchemaBoundValidationContext
+export function validationContext <T>(objectToValidate: T, schema: IValidationSchema<T>): ISchemaBoundValidationContext<T>
 export function validationContext <T>(objectToValidate: T): IBoundValidationContext<T>
 export function validationContext (): IValidationContext
 export function validationContext <T>(
   objectToValidate?: any,
   schema?: IValidationSchema<T>
-): IValidationContext | IBoundValidationContext<T> | ISchemaBoundValidationContext {
+): IValidationContext | IBoundValidationContext<T> | ISchemaBoundValidationContext<T> {
   const v = new ValidationContext()
   if (objectToValidate !== null && objectToValidate !== undefined) {
     if (schema) {
