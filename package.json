@@ -52,15 +52,18 @@
     "mocha": "^3.2.0",
     "nodemon": "^1.11.0",
     "nyc": "^10.1.2",
-    "rimraf": "^2.6.0",
+    "rimraf": "^2.6.1",
     "sinon": "^1.17.7",
     "sinon-chai": "^2.8.0",
-    "tslint": "^4.4.2",
+    "tslint": "^4.5.1",
     "tslint-config-standard": "^4.0.0",
-    "typescript": "2.2.0"
+    "typescript": "2.2.1",
+    "mobx": "^3.1.0"
+  },
+  "peerDependencies": {
+    "mobx": "^3.1.0"
   },
   "dependencies": {
-    "email-validator": "^1.0.7",
-    "mobx": "^3.1.0"
+    "email-validator": "^1.0.7"
   }
 }
