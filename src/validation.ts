@@ -171,7 +171,11 @@ export class ValidationContext implements IValidationContext {
     forEach(schema, (validators: Array<IValidator<T>>, field: string) => {
       const errors = this.ensureErrors(field)
       const value = (obj as any)[field]
-      forEach(validators, (validator: IValidator<T>) => {
+      forEach(validators, (validator?: IValidator<T>) => {
+        if (!validator) {
+          return
+        }
+
         const opts: IValidatorOptions<T> = {
           field,
           value,
