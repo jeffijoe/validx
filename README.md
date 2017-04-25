@@ -17,6 +17,28 @@ Validation library for [MobX](https://github.com/mobxjs/mobx).
 npm install --save validx
 ```
 
+Table of Contents
+=================
+
+   * [Why?](#why)
+   * [Examples](#examples)
+   * [API documentation](#api-documentation)
+      * [The ValidationContext](#the-validationcontext)
+         * [`validate()`](#validate)
+         * [`reset()`](#reset)
+      * [`addErrors()`](#adderrors)
+      * [`getErrors()`](#geterrors)
+      * [`getError()`](#geterror)
+      * [`errors`](#errors)
+      * [`isValid`](#isvalid)
+      * [Validators](#validators)
+      * [Built-in validators](#built-in-validators)
+         * [`required`](#required)
+         * [`pattern`](#pattern)
+         * [`func`](#func)
+      * [Bound `ValidationContext`](#bound-validationcontext)
+   * [Author](#author)
+
 # Why?
 
 We want to reactively display validation issues in our UI when using MobX. You can use
@@ -435,18 +457,6 @@ const validation = validationContext(obj, {
 
 validation.validate()
 ```
-
-# Changelog
-
-## v0.1.0
-
-- Added `validation.getErrors()`
-- Added `validation.getError()`
-- Removed `lodash` dependency
-
-## v0.0.4
-
-- First official release.
 
 # Author
 
