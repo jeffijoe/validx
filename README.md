@@ -328,6 +328,79 @@ console.log(validation.errors.age)
 // ['Must be 13 years or older']
 ```
 
+## Built-in validators
+
+### `required`
+
+Takes a string (error message) or an object in the form of `{ required: boolean, msg: string }`.
+
+If `required === false`, the validator will always return true.
+
+```js
+{
+  // default message
+  firstName: [required()],
+  // shorthand
+  lastName: [required('Last name, please?')],
+  // Fully-fledged, only enabled if `this.getSmsNotifications` is `true`
+  phoneNumber: [
+    required({
+      msg: 'Please enter your number so we can send you those notifications',
+      required: this.getSmsNotifications,
+    })
+  ]
+}
+```
+
+### `pattern`
+
+Let's you specify a named pattern or your own regex. Supports simple and config signatures.
+
+Named patterns:
+
+* `'email'` (uses `email-validator`)
+* `'url'` (uses `is-url`)
+
+Example:
+
+```js
+{
+  // simple
+  email: [pattern('email')],
+  // simple with message
+  homepage: [pattern('url', 'Not a valid URL, come on!')],
+  // simple regex with message
+  bio: [pattern(/javascript/i, 'Sorry - no JS, no job.')],
+  // config with regex and message
+  twitterHandle: [
+    pattern({
+      pattern: /^@/,
+      msg: 'Twitter handles start with an @'
+    })
+  ]
+}
+```
+
+### `func`
+
+If you dislike the `boolean || 'message'` approach to custom validators, you can use `func`.
+
+Example:
+
+```js
+{
+  knownLibraries: [
+    // Without func.
+    (opts) => opts.value.includes('react') || 'Sorry, only React devs here!',
+    // With func.
+    func(
+      (opts) => opts.value.includes('react'),
+      'Sorry, only React devs here!'
+    )
+  ]
+}
+```
+
 ## Bound `ValidationContext`
 
 By passing either 1 or 2 parameters to `validationContext`, you can "pre-bind" it

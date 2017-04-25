@@ -1,5 +1,11 @@
 import { IRule, IValidator } from '../validation'
 import * as emailValidator from 'email-validator'
+import isUrl = require('is-url')
+
+export type Pattern =
+  | 'email'
+  | 'url'
+  | RegExp
 
 /**
  * Rule specifics.
@@ -9,28 +15,41 @@ import * as emailValidator from 'email-validator'
  * @extends {IRule<any>}
  */
 export interface IPatternRule extends IRule<any> {
-  pattern: 'email' | RegExp
+  pattern: Pattern
 }
 
 const DEFAULT_MESSAGE = 'This field is invalid'
 
 const PatternMessages = {
-  email: 'This is not a valid email'
+  email: 'This is not a valid email',
+  url: 'This is not a valid url'
 }
 
 /**
  * The validator function.
  */
-export const pattern = (rule: IPatternRule): IValidator<any> => {
+export const pattern = (
+  rule: IPatternRule | Pattern,
+  msg?: string
+): IValidator<any> => {
   const validator: IValidator<any> = (opts) => {
     let valid = false
-    if (rule.pattern === 'email') {
+    const pattern = typeof rule === 'string' || rule instanceof RegExp
+      ? rule
+      : rule.pattern
+    const message = typeof rule === 'string' || rule instanceof RegExp
+      ? msg
+      : rule.msg
+
+    if (pattern === 'email') {
       valid = emailValidator.validate(opts.value)
+    } else if (pattern === 'url') {
+      valid = isUrl(opts.value)
     } else {
-      valid = (rule.pattern as RegExp).test(opts.value)
+      valid = (pattern as RegExp).test(opts.value)
     }
 
-    return valid || rule.msg || (typeof rule.pattern === 'string' && PatternMessages[rule.pattern]) || DEFAULT_MESSAGE
+    return valid || message || (typeof pattern === 'string' && PatternMessages[pattern]) || DEFAULT_MESSAGE
   }
 
   return validator

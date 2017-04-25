@@ -4,6 +4,7 @@ import { IValidator, IRule } from '../validation'
  * Rule options.
  */
 export interface IRequiredRule extends IRule<any> {
+  required?: boolean
 }
 
 const DEFAULT_MESSAGE = 'This field is required'
@@ -16,6 +17,10 @@ const DEFAULT_MESSAGE = 'This field is required'
  * @returns {(opts:any)=>boolean|string}
  */
 export const required = (rule?: IRequiredRule | string): IValidator<any> => {
+  if (typeof rule !== 'string' && rule !== undefined && rule.required === false) {
+    return () => true
+  }
+
   return (opts) => {
     return opts.value || opts.value === 0 // 0 is the only allowed falsy value.
       ? true
