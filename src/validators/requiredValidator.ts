@@ -13,7 +13,7 @@ const DEFAULT_MESSAGE = 'This field is required'
  * The only exception is the number 0.
  *
  * @param rule
- * @returns {(opts:any)=>boolean|string|IRequiredRule}
+ * @returns {(opts:any)=>boolean|string}
  */
 export const required = (rule?: IRequiredRule | string): IValidator<any> => {
   return (opts) => {
