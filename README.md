@@ -29,6 +29,7 @@ Table of Contents
       * [`addErrors()`](#adderrors)
       * [`getErrors()`](#geterrors)
       * [`getError()`](#geterror)
+      * [`clearErrors()`](#clearerrors)
       * [`errors`](#errors)
       * [`isValid`](#isvalid)
       * [Validators](#validators)
@@ -287,6 +288,26 @@ validation.getError('name')
 validation.reset()
 validation.getError('name')
 // undefined
+```
+
+## `clearErrors()`
+
+Clear errors for a single field, instead of reseting the whole context.
+
+```js
+const validation = validationContext()
+validation.addErrors({ name: ['Not cool'], language: ['Must be JS'] })
+
+validation.getError('name')
+// 'Not cool'
+
+validation.clearErrors('name')
+
+validation.getError('name')
+// 'Not cool'
+
+validation.getError('language')
+// 'Must be JS'
 ```
 
 ## `errors`

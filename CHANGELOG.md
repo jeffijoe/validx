@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Added `clearErrors(field: string)` to the context, lets you remove errors for a particular field.
+
 ## 0.1.4
 
 - Added `url` pattern validator.

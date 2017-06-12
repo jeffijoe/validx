@@ -73,6 +73,7 @@ export interface IValidationContext {
   addErrors (errors: IValidationErrors | { [key: string]: string[] }): this
   getErrors (field: string): string[]
   getError (field: string): string | undefined
+  clearErrors (field: string): this
 }
 
 /**
@@ -132,6 +133,7 @@ export class ValidationContext implements IValidationContext {
   constructor () {
     this.reset = action.bound(this.reset)
     this.addErrors = action.bound(this.addErrors)
+    this.clearErrors = action.bound(this.clearErrors)
     this.validate = action.bound(this.validate)
     extendObservable(this, {
       errorsMap: observable.map<string[]>(),
@@ -225,6 +227,14 @@ export class ValidationContext implements IValidationContext {
    */
   getError (field: string) {
     return this.getErrors(field)[0]
+  }
+
+  /**
+   * Removes errors for a particular field.
+   */
+  clearErrors (field: string) {
+    this.errorsMap.set(field, [])
+    return this
   }
 
   /**

@@ -176,6 +176,16 @@ describe('ValidationContext', () => {
     })
   })
 
+  describe('#clearErrors', function () {
+    it('clears errors for the specified field', () => {
+      const c = validationContext()
+      c.addErrors({ test: ['Hello'] })
+      expect(c.getError('test')).to.deep.equal('Hello')
+      c.clearErrors('test')
+      expect(c.getError('test')).to.be.undefined
+    })
+  })
+
   describe('validators', () => {
     describe('regular function', () => {
       it('works', () => {
