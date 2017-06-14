@@ -26,12 +26,12 @@ Table of Contents
       * [The ValidationContext](#the-validationcontext)
          * [`validate()`](#validate)
          * [`reset()`](#reset)
-      * [`addErrors()`](#adderrors)
-      * [`getErrors()`](#geterrors)
-      * [`getError()`](#geterror)
-      * [`clearErrors()`](#clearerrors)
-      * [`errors`](#errors)
-      * [`isValid`](#isvalid)
+         * [`addErrors()`](#adderrors)
+         * [`getErrors()`](#geterrors)
+         * [`getError()`](#geterror)
+         * [`clearErrors()`](#clearerrors)
+         * [`errors`](#errors)
+         * [`isValid`](#isvalid)
       * [Validators](#validators)
       * [Built-in validators](#built-in-validators)
          * [`required`](#required)
@@ -236,7 +236,7 @@ console.log(textElement.validation.errors)
 // { placeholder: ['Placeholder required'] }
 ```
 
-## `addErrors()`
+### `addErrors()`
 
 If you at some point want to add errors without calling validate, this
 is how to do it. `addErrors()` is a MobX `action`.
@@ -256,7 +256,7 @@ console.log(validation.errors.username)
 // ['Username is taken']
 ```
 
-## `getErrors()`
+### `getErrors()`
 
 Safer way to get errors for a field rather than using `errors.field`,
 as this will return an empty array in case there are no errors.
@@ -273,7 +273,7 @@ validation.getErrors('name')
 // []
 ```
 
-## `getError()`
+### `getError()`
 
 Convenience method for `getErrors('field')[0]`.
 Returns `undefined` if the error is not found.
@@ -290,7 +290,7 @@ validation.getError('name')
 // undefined
 ```
 
-## `clearErrors()`
+### `clearErrors()`
 
 Clear errors for a single field, instead of reseting the whole context.
 
@@ -310,7 +310,7 @@ validation.getError('language')
 // 'Must be JS'
 ```
 
-## `errors`
+### `errors`
 
 A MobX `computed` map of field -> errors. When `validate` discovers validation errors, it
 puts them in here.
@@ -333,7 +333,7 @@ validation.validate()
 // that's why you need to remember to `reset()` first!
 ```
 
-## `isValid`
+### `isValid`
 
 A MobX `computed` property that determines whether the context
 has any errors or not.
