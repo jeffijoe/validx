@@ -3,7 +3,7 @@ import { IValidator, IRule } from '../validation'
 /**
  * Rule options.
  */
-export interface IFuncRule extends IRule<any> {
+export interface IFuncRule extends IRule {
   fn: IValidator<any>
 }
 
@@ -15,12 +15,17 @@ const DEFAULT_MESSAGE = 'This field is not valid'
  * @param rule
  * @returns {(opts:any)=>boolean|string}
  */
-export const func = (rule: IFuncRule | IValidator<any>, msg: string = DEFAULT_MESSAGE): IValidator<any> => {
+export const func = (
+  rule: IFuncRule | IValidator<any>,
+  msg: string = DEFAULT_MESSAGE
+): IValidator<any> => {
   if (!rule) {
-    throw new TypeError('Expected a function or a configuration object, got ' + rule)
+    throw new TypeError(
+      'Expected a function or a configuration object, got ' + rule
+    )
   }
 
-  return (opts) => {
+  return opts => {
     if (typeof rule === 'function') {
       return rule(opts) || msg
     }

@@ -1,4 +1,11 @@
-import { observable, extendObservable, action, computed, ObservableMap, IObservableArray } from 'mobx'
+import {
+  observable,
+  extendObservable,
+  action,
+  computed,
+  ObservableMap,
+  toJS
+} from 'mobx'
 import { forEach, every } from './utils'
 
 /**
@@ -34,7 +41,7 @@ export interface IValidator<T> {
  * @interface IRule
  * @template T
  */
-export interface IRule<T> {
+export interface IRule {
   msg?: string
 }
 
@@ -45,9 +52,7 @@ export interface IRule<T> {
  * @interface IValidationSchema
  * @template T The object type.
  */
-export type IValidationSchema<T> = {
-  [P in keyof T]?: Array<IValidator<T>>
-}
+export type IValidationSchema<T> = { [P in keyof T]?: Array<IValidator<T>> }
 
 /**
  * Validation errors are stored as a map of fields to error strings.
@@ -56,7 +61,7 @@ export type IValidationSchema<T> = {
  * @interface IValidationErrors
  */
 export interface IValidationErrors {
-  [key: string]: IObservableArray<string>
+  [key: string]: Array<string>
 }
 
 /**
@@ -68,28 +73,29 @@ export interface IValidationErrors {
 export interface IValidationContext {
   errors: IValidationErrors
   isValid: boolean
-  reset (): this
-  validate<T> (obj: T, schema: IValidationSchema<T>): this
-  addErrors (errors: IValidationErrors | { [key: string]: string[] }): this
-  getErrors (field: string): string[]
-  getError (field: string): string | undefined
-  clearErrors (field: string): this
+  reset(): this
+  validate<T>(obj: T, schema: IValidationSchema<T>): this
+  addErrors(errors: IValidationErrors | { [key: string]: string[] }): this
+  getErrors(field: string): string[]
+  getError(field: string): string | undefined
+  clearErrors(field: string): this
 }
 
 /**
  * Validation context with the object already bound to the validate function.
  */
 export interface IBoundValidationContext<T> extends IValidationContext {
-  validate (schema: IValidationSchema<T>): this
-  getErrors (field: keyof T): string[]
-  getError (field: keyof T): string | undefined
+  validate(schema: IValidationSchema<T>): this
+  getErrors(field: keyof T): string[]
+  getError(field: keyof T): string | undefined
 }
 
 /**
  * Validation context with the object already bound to the validate function.
  */
-export interface ISchemaBoundValidationContext<T> extends IBoundValidationContext<T> {
-  validate (): this
+export interface ISchemaBoundValidationContext<T>
+  extends IBoundValidationContext<T> {
+  validate(): this
 }
 
 /**
@@ -125,25 +131,32 @@ export class ValidationContext implements IValidationContext {
    *
    * @memberOf ValidationContext
    */
-  private errorsMap: ObservableMap<string[]>
+  private errorsMap: ObservableMap<string, string[]>
 
   /**
    * Initializes a new instance of ValidationContext.
    */
-  constructor () {
-    this.reset = action.bound(this.reset)
-    this.addErrors = action.bound(this.addErrors)
-    this.clearErrors = action.bound(this.clearErrors)
-    this.validate = action.bound(this.validate)
-    extendObservable(this, {
-      errorsMap: observable.map<string[]>(),
-      errors: computed(() => {
-        return this.errorsMap.toJS()
-      }),
-      isValid: computed(() => {
-        return every(this.errors, (arr: string[]) => arr.length === 0)
-      })
-    })
+  constructor() {
+    this.reset = action(this.reset)
+    this.addErrors = action(this.addErrors)
+    this.clearErrors = action(this.clearErrors)
+    this.validate = action(this.validate)
+    extendObservable(
+      this,
+      {
+        errorsMap: observable.map<string, string[]>(),
+        get errors() {
+          return toJS(this.errorsMap)
+        },
+        get isValid() {
+          return every(this.errors, (arr: string[]) => arr.length === 0)
+        }
+      },
+      {
+        errors: computed,
+        isValid: computed
+      }
+    )
   }
 
   /**
@@ -153,7 +166,7 @@ export class ValidationContext implements IValidationContext {
    *
    * @memberOf ValidationContext
    */
-  reset (): this {
+  reset(): this {
     this.errorsMap.clear()
     return this
   }
@@ -169,7 +182,7 @@ export class ValidationContext implements IValidationContext {
    *
    * @memberOf ValidationContext
    */
-  validate<T> (obj: T, schema: IValidationSchema<T>): this {
+  validate<T>(obj: T, schema: IValidationSchema<T>): this {
     forEach(schema, (validators: Array<IValidator<T>>, field: string) => {
       const errors = this.ensureErrors(field)
       const value = (obj as any)[field]
@@ -189,7 +202,7 @@ export class ValidationContext implements IValidationContext {
         if (result === true) {
           return
         } else if (result !== false) {
-          msg = (result as string)
+          msg = result
         }
 
         errors.push(msg)
@@ -202,7 +215,7 @@ export class ValidationContext implements IValidationContext {
   /**
    * Adds errors to the context.
    */
-  addErrors (errors: IValidationErrors | { [key: string]: string[] }) {
+  addErrors(errors: IValidationErrors | { [key: string]: string[] }) {
     forEach(errors, (arr: string[], field: string) => {
       this.ensureErrors(field).push(...arr)
     })
@@ -212,7 +225,7 @@ export class ValidationContext implements IValidationContext {
   /**
    * Gets the errors for the given field.
    */
-  getErrors (field: string) {
+  getErrors(field: string) {
     const errors = this.errors[field]
     if (!errors) {
       return []
@@ -225,14 +238,14 @@ export class ValidationContext implements IValidationContext {
    * Gets the first error for the given field.
    * If not found, returns undefined.
    */
-  getError (field: string) {
+  getError(field: string) {
     return this.getErrors(field)[0]
   }
 
   /**
    * Removes errors for a particular field.
    */
-  clearErrors (field: string) {
+  clearErrors(field: string) {
     this.errorsMap.set(field, [])
     return this
   }
@@ -247,10 +260,10 @@ export class ValidationContext implements IValidationContext {
    *
    * @memberOf ValidationContext
    */
-  private ensureErrors (field: string) {
+  private ensureErrors(field: string) {
     let errors = this.errorsMap.get(field)
     if (!errors) {
-      errors = observable([])
+      errors = observable.array([])
       this.errorsMap.set(field, errors)
     }
 
@@ -266,19 +279,29 @@ export class ValidationContext implements IValidationContext {
    *
    * @memberOf ValidationContext
    */
-  private cleanupErrors () {
-    const entries = this.errorsMap.entries().filter(([, value]) => value.length === 0)
+  private cleanupErrors() {
+    const entries = Array.from(this.errorsMap.entries()).filter(
+      ([, value]) => value.length === 0
+    )
     entries.forEach(([key]) => this.errorsMap.delete(key))
   }
 }
 
-export function validationContext<T> (objectToValidate: T, schema: IValidationSchema<T>): ISchemaBoundValidationContext<T>
-export function validationContext<T> (objectToValidate: T): IBoundValidationContext<T>
-export function validationContext (): IValidationContext
-export function validationContext<T> (
+export function validationContext<T>(
+  objectToValidate: T,
+  schema: IValidationSchema<T>
+): ISchemaBoundValidationContext<T>
+export function validationContext<T>(
+  objectToValidate: T
+): IBoundValidationContext<T>
+export function validationContext(): IValidationContext
+export function validationContext<T>(
   objectToValidate?: any,
   schema?: IValidationSchema<T>
-): IValidationContext | IBoundValidationContext<T> | ISchemaBoundValidationContext<T> {
+):
+  | IValidationContext
+  | IBoundValidationContext<T>
+  | ISchemaBoundValidationContext<T> {
   const v = new ValidationContext()
   if (objectToValidate !== null && objectToValidate !== undefined) {
     if (schema) {

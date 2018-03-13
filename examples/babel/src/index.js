@@ -4,15 +4,12 @@ import { inspect } from 'util'
 
 // Does not have to be an observable,
 // so to demonstrate I'll use a plain object.
-const obj = {
-}
+const obj = {}
 
 // First parameter is the object to validate, second
 // is the validation schema.
 const validation = validationContext(obj, {
-  name: [
-    required({ msg: 'Name is required' })
-  ],
+  name: [required({ msg: 'Name is required' })],
   email: [
     required('Email is required'), // shorthand message parameter for the required validator.
     pattern({ pattern: 'email', msg: 'That is not a valid email' })
@@ -24,7 +21,7 @@ const validation = validationContext(obj, {
       msg: 'Age must be a number'
     }),
     // And a custom validator.
-    (opts) => {
+    opts => {
       // Validators return either true for success, and false (for the default error message)
       // or a string (for a custom error message)
       return opts.value >= 13 || 'You must be over 13 years of age to sign up.'
@@ -50,7 +47,10 @@ autorun(() => {
       inspect(validation.errors[key].slice(), { colors: true })
     )
   })
-  console.log('-- So is it valid?', validation.isValid ? 'Yes it is!' : 'Hell naw!')
+  console.log(
+    '-- So is it valid?',
+    validation.isValid ? 'Yes it is!' : 'Hell naw!'
+  )
 })
 
 // The context needs to be reset every time we validate

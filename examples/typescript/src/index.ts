@@ -1,4 +1,9 @@
-import { validationContext, required, pattern, IValidatorOptions } from '../../../lib'
+import {
+  validationContext,
+  required,
+  pattern,
+  IValidatorOptions
+} from '../../../lib'
 import { action, autorun } from 'mobx'
 import { inspect } from 'util'
 
@@ -10,15 +15,12 @@ interface IObj {
 
 // Does not have to be an observable,
 // so to demonstrate I'll use a plain object.
-const obj: IObj = {
-}
+const obj: IObj = {}
 
 // First parameter is the object to validate, second
 // is the validation schema.
 const validation = validationContext(obj, {
-  name: [
-    required({ msg: 'Name is required' })
-  ],
+  name: [required({ msg: 'Name is required' })],
   email: [
     required('Email is required'), // shorthand message parameter for the required validator.
     pattern({ pattern: 'email', msg: 'That is not a valid email' })
@@ -56,7 +58,10 @@ autorun(() => {
       inspect(validation.errors[key].slice(), { colors: true })
     )
   })
-  console.log('-- So is it valid?', validation.isValid ? 'Yes it is!' : 'Hell naw!')
+  console.log(
+    '-- So is it valid?',
+    validation.isValid ? 'Yes it is!' : 'Hell naw!'
+  )
 })
 
 // The context needs to be reset every time we validate

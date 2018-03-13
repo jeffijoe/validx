@@ -27,7 +27,7 @@ describe('utils', () => {
     it('only iterates own props', () => {
       class Test {
         test: string
-        method () {}
+        method() {}
       }
 
       const instance = new Test()
@@ -39,20 +39,20 @@ describe('utils', () => {
     })
   })
 
-  describe('every', function () {
+  describe('every', function() {
     it('returns true if every element satisfies the predicate', () => {
       const arr = [1, 1, 1]
-      expect(every(arr, (x) => x === 1)).to.equal(true)
+      expect(every(arr, x => x === 1)).to.equal(true)
     })
 
     it('returns false if some element does not satisfy the predicate', () => {
       const arr = [1, 1, 2]
-      expect(every(arr, (x) => x === 1)).to.equal(false)
+      expect(every(arr, x => x === 1)).to.equal(false)
     })
 
     it('stops early if it encounters false', () => {
       const arr = [1, 2, 1]
-      const predicate = spy((x) => x === 1)
+      const predicate = spy(x => x === 1)
       expect(every(arr, predicate)).to.equal(false)
       expect(predicate).has.been.calledTwice
       expect(predicate).has.been.calledWith(1, 0, arr)
@@ -60,8 +60,8 @@ describe('utils', () => {
     })
 
     it('works on objects', () => {
-      expect(every({ a: 1, b: 2 }, (v) => v === 2)).to.equal(false)
-      expect(every({ a: 2, b: 2 }, (v) => v === 2)).to.equal(true)
+      expect(every({ a: 1, b: 2 }, v => v === 2)).to.equal(false)
+      expect(every({ a: 2, b: 2 }, v => v === 2)).to.equal(true)
     })
   })
 })
