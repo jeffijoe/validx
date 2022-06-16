@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-alpha.2
+
+* Upgraded to MobX 6
+* Removed `peerDependencies` in favor of BYOM (Bring Your Own MobX)
+* Overhaul build, lint and test infra
+
 ## 1.0.0
 
 * Upgraded to MobX v4, breaks compatibility with MobX <= 3
