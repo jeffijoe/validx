@@ -6,7 +6,7 @@
   "compilerOptions": {
     "outDir": "../lib",
     "strictNullChecks": true,
-    "target": "es5",
+    "target": "ES2019",
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,

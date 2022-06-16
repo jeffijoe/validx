@@ -1,4 +1,4 @@
-import { forEach, every } from '../src/utils'
+import { forEach, every, mapToObject } from '../src/utils'
 import { spy } from 'sinon'
 import { expect } from 'chai'
 
@@ -39,20 +39,20 @@ describe('utils', () => {
     })
   })
 
-  describe('every', function() {
+  describe('every', function () {
     it('returns true if every element satisfies the predicate', () => {
       const arr = [1, 1, 1]
-      expect(every(arr, x => x === 1)).to.equal(true)
+      expect(every(arr, (x) => x === 1)).to.equal(true)
     })
 
     it('returns false if some element does not satisfy the predicate', () => {
       const arr = [1, 1, 2]
-      expect(every(arr, x => x === 1)).to.equal(false)
+      expect(every(arr, (x) => x === 1)).to.equal(false)
     })
 
     it('stops early if it encounters false', () => {
       const arr = [1, 2, 1]
-      const predicate = spy(x => x === 1)
+      const predicate = spy((x) => x === 1)
       expect(every(arr, predicate)).to.equal(false)
       expect(predicate).has.been.calledTwice
       expect(predicate).has.been.calledWith(1, 0, arr)
@@ -60,8 +60,21 @@ describe('utils', () => {
     })
 
     it('works on objects', () => {
-      expect(every({ a: 1, b: 2 }, v => v === 2)).to.equal(false)
-      expect(every({ a: 2, b: 2 }, v => v === 2)).to.equal(true)
+      expect(every({ a: 1, b: 2 }, (v) => v === 2)).to.equal(false)
+      expect(every({ a: 2, b: 2 }, (v) => v === 2)).to.equal(true)
+    })
+  })
+
+  describe('mapToObject', () => {
+    it('maps a map to an object', () => {
+      const map = new Map([
+        ['one', 1],
+        ['two', 2],
+      ])
+      const obj = mapToObject(map)
+
+      expect(obj['one']).to.equal(1)
+      expect(obj['two']).to.equal(2)
     })
   })
 })
