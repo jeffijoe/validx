@@ -14,7 +14,8 @@ Validation library for [MobX](https://github.com/mobxjs/mobx).
 ## Install
 
 ```
-npm install --save validx
+# Bring your own MobX
+npm install --save mobx validx
 ```
 
 Table of Contents

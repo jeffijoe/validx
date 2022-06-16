@@ -1,26 +1,21 @@
 {
-  "include": [
-    "./**/*.ts",
-    "../src/client/**/*.ts"
-  ],
+  "exclude": ["node_modules", "lib"],
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "../.test-out",
+    "outDir": "./lib",
+    "strict": true,
     "strictNullChecks": true,
     "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
     "target": "es6",
     "module": "commonjs",
-    "jsx": "react",
     "moduleResolution": "node",
-    "noImplicitAny": false,
+    "importHelpers": false,
     "sourceMap": true,
+    "declaration": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "../src/client",
-    "lib": [
-      "es5",
-      "es6",
-      "es7",
-      "dom"
-    ]
+    "lib": ["es6", "es7"]
   }
 }

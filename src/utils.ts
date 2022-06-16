@@ -23,7 +23,10 @@ function arrayEach<T>(
 /**
  * A specialized version of `forEach` for objects.
  */
-function objectEach<T>(source: T, iteratee: Iteratee<any, string, T, any>): T {
+function objectEach<T extends Record<string, unknown>>(
+  source: T,
+  iteratee: Iteratee<any, string, T, any>
+): T {
   for (let key in source) {
     /* istanbul ignore next */
     if (source.hasOwnProperty(key)) {
@@ -78,5 +81,21 @@ export function every(
       return false
     }
   })
+  return result
+}
+
+/**
+ * Creates an object hash from a map.
+ *
+ * @param map
+ */
+export function mapToObject<K extends string, V>(map: Map<K, V>): Record<K, V> {
+  const result: Record<K, V> = {} as any
+  const entries = Array.from(map.entries())
+  for (let index = 0; index < entries.length; index++) {
+    const [key, value] = entries[index]
+    result[key] = value
+  }
+
   return result
 }

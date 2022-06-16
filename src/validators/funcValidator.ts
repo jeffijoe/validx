@@ -25,7 +25,7 @@ export const func = (
     )
   }
 
-  return opts => {
+  return (opts) => {
     if (typeof rule === 'function') {
       return rule(opts) || msg
     }

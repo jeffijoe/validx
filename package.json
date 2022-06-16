@@ -4,19 +4,17 @@
   "description": "Validation library for MobX",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
-  "engines": {
-    "node": ">=4.0.0"
-  },
+  "engines": {},
   "scripts": {
-    "build": "rimraf lib && tsc -p src",
-    "check": "tsc -p src/tsconfig.json --noEmit --pretty",
-    "lint": "npm run check && tslint --project src/tsconfig.json --fix \"{src,test,examples}/**/*.ts\" && prettier --write \"{src,test,examples}/**/*.{ts,js}\"",
+    "build": "rimraf lib && tsc -p tsconfig.build.json",
+    "check": "tsc -p tsconfig.json --noEmit --pretty",
+    "lint": "npm run check && tslint --project tsconfig.json --fix \"{src,examples}/**/*.ts\" && prettier --write \"{src,examples}/**/*.{ts,js}\"",
     "precommit": "lint-staged && npm test",
-    "test": "rimraf .test-out && tsc --skipLibCheck -p test && mocha '.test-out/test/**/*.spec.js' --require .test-out/test/index.js",
+    "test": "npm run check && jest",
     "test:watch": "nodemon -e js,ts --exec npm run test",
     "lint:watch": "nodemon -e ts --exec npm run lint",
-    "cover": "nyc npm test",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "cover": "npm run test -- --coverage",
+    "coveralls": "npm run cover && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "publish:pre": "npm run lint && npm run build && npm run cover",
     "publish:post": "npm publish && git push --follow-tags",
     "release:prerelease": "npm run publish:pre && npm version prerelease && npm run publish:post",
@@ -30,9 +28,8 @@
   },
   "lint-staged": {
     "*.ts": [
-      "tslint --fix",
-      "prettier --write",
-      "git add"
+      "tslint --project tsconfig.json --fix",
+      "prettier --write"
     ]
   },
   "repository": {
@@ -60,34 +57,51 @@
   },
   "homepage": "https://github.com/jeffijoe/validx#readme",
   "devDependencies": {
-    "@types/chai": "^4.1.2",
+    "@types/chai": "^4.3.1",
     "@types/email-validator": "^1.0.30",
-    "@types/is-url": "^1.2.28",
-    "@types/mocha": "^5.0.0",
-    "@types/node": "^9.6.5",
-    "@types/sinon-chai": "^2.7.29",
-    "chai": "^4.1.2",
-    "coveralls": "^3.0.0",
-    "husky": "^0.14.3",
-    "lint-staged": "^7.0.4",
-    "mobx": "^4.1.1",
-    "mocha": "^5.1.0",
-    "nodemon": "^1.17.3",
-    "nyc": "^11.6.0",
-    "prettier": "^1.12.0",
-    "rimraf": "^2.6.2",
-    "sinon": "^4.5.0",
-    "sinon-chai": "^3.0.0",
-    "tslint": "^5.9.1",
-    "tslint-config-prettier": "^1.10.0",
-    "tslint-config-standard": "^7.0.0",
-    "typescript": "2.8.1"
-  },
-  "peerDependencies": {
-    "mobx": "^3.1.15"
+    "@types/is-url": "^1.2.30",
+    "@types/jest": "^28.1.1",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.0.0",
+    "@types/sinon-chai": "^3.2.8",
+    "chai": "^4.3.6",
+    "coveralls": "^3.1.1",
+    "husky": "^8.0.1",
+    "jest": "^28.1.1",
+    "lint-staged": "^13.0.1",
+    "mobx": "^6.6.0",
+    "mocha": "^10.0.0",
+    "nodemon": "^2.0.16",
+    "nyc": "^15.1.0",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "sinon": "^14.0.0",
+    "sinon-chai": "^3.7.0",
+    "ts-jest": "^28.0.5",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-config-standard": "^9.0.0",
+    "typescript": "^4.7.3"
   },
   "dependencies": {
-    "email-validator": "^2.0.3",
+    "email-validator": "^2.0.4",
     "is-url": "^1.2.4"
+  },
+  "jest": {
+    "testRegex": "(/__tests__/.*\\.(test|spec))\\.(ts|tsx|js)$",
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "__tests__",
+      "lib"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    }
   }
 }

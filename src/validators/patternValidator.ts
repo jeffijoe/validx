@@ -19,7 +19,7 @@ const DEFAULT_MESSAGE = 'This field is invalid'
 
 const PatternMessages = {
   email: 'This is not a valid email',
-  url: 'This is not a valid url'
+  url: 'This is not a valid url',
 }
 
 /**
@@ -29,7 +29,7 @@ export const pattern = (
   rule: IPatternRule | Pattern,
   msg?: string
 ): IValidator<any> => {
-  const validator: IValidator<any> = opts => {
+  const validator: IValidator<any> = (opts) => {
     let valid = false
     const pattern =
       typeof rule === 'string' || rule instanceof RegExp ? rule : rule.pattern

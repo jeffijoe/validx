@@ -4,9 +4,14 @@ import {
   action,
   computed,
   ObservableMap,
-  toJS
+  toJS,
 } from 'mobx'
-import { forEach, every } from './utils'
+import { forEach, every, mapToObject } from './utils'
+
+/**
+ * A validatable object where all keys are strings.
+ */
+export type Validatable = Record<string, unknown>
 
 /**
  * Options passed to validators.
@@ -84,10 +89,15 @@ export interface IValidationContext {
 /**
  * Validation context with the object already bound to the validate function.
  */
-export interface IBoundValidationContext<T> extends IValidationContext {
+export interface IBoundValidationContext<T> {
+  errors: IValidationErrors
+  isValid: boolean
+  reset(): this
   validate(schema: IValidationSchema<T>): this
+  addErrors(errors: IValidationErrors | { [key: string]: string[] }): this
   getErrors(field: keyof T): string[]
   getError(field: keyof T): string | undefined
+  clearErrors(field: string): this
 }
 
 /**
@@ -113,7 +123,7 @@ export class ValidationContext implements IValidationContext {
    * @type {IValidationErrors}
    * @memberOf ValidationContext
    */
-  readonly errors: IValidationErrors
+  readonly errors!: IValidationErrors
 
   /**
    * Determines if the validation context is in a valid state (no errors)
@@ -122,7 +132,7 @@ export class ValidationContext implements IValidationContext {
    * @type {boolean}
    * @memberOf ValidationContext
    */
-  readonly isValid: boolean
+  readonly isValid!: boolean
 
   /**
    * Internal map of the errors.
@@ -131,7 +141,7 @@ export class ValidationContext implements IValidationContext {
    *
    * @memberOf ValidationContext
    */
-  private errorsMap: ObservableMap<string, string[]>
+  private errorsMap!: ObservableMap<string, string[]>
 
   /**
    * Initializes a new instance of ValidationContext.
@@ -146,15 +156,15 @@ export class ValidationContext implements IValidationContext {
       {
         errorsMap: observable.map<string, string[]>(),
         get errors() {
-          return toJS(this.errorsMap)
+          return mapToObject(toJS(this.errorsMap))
         },
         get isValid() {
           return every(this.errors, (arr: string[]) => arr.length === 0)
-        }
+        },
       },
       {
         errors: computed,
-        isValid: computed
+        isValid: computed,
       }
     )
   }
@@ -194,7 +204,7 @@ export class ValidationContext implements IValidationContext {
         const opts: IValidatorOptions<T> = {
           field,
           value,
-          obj
+          obj,
         }
 
         let msg = 'This field is invalid.'
