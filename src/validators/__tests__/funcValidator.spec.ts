@@ -1,6 +1,5 @@
 import 'mocha'
-import { ValidationContext, func } from '../../src'
-import { expect } from 'chai'
+import { ValidationContext, func } from '../..'
 
 describe('funcValidator', () => {
   it('works', () => {
@@ -9,11 +8,11 @@ describe('funcValidator', () => {
       { name: '', title: '' },
       {
         name: [func(() => true, 'Haha')],
-        title: [func(() => false, 'Lol')]
+        title: [func(() => false, 'Lol')],
       }
     )
-    expect(c.errors['name']).to.equal(undefined)
-    expect(c.errors['title'][0]).to.equal('Lol')
+    expect(c.errors['name']).toBeUndefined()
+    expect(c.errors['title'][0]).toEqual('Lol')
   })
 
   it('accepts a config object', () => {
@@ -22,16 +21,15 @@ describe('funcValidator', () => {
       { name: '', title: '' },
       {
         name: [func({ fn: () => false, msg: 'Haha' })],
-        title: [func({ fn: () => false }, 'Lol')]
+        title: [func({ fn: () => false }, 'Lol')],
       }
     )
-    expect(c.errors['name'][0]).to.equal('Haha')
-    expect(c.errors['title'][0]).to.equal('Lol')
+    expect(c.errors['name'][0]).toEqual('Haha')
+    expect(c.errors['title'][0]).toEqual('Lol')
   })
 
   it('rejects anything else', () => {
-    const c = new ValidationContext()
-    expect(() => func(undefined as any)).to.throw(TypeError)
-    expect(() => func(null as any)).to.throw(TypeError)
+    expect(() => func(undefined as any)).toThrowError(TypeError)
+    expect(() => func(null as any)).toThrowError(TypeError)
   })
 })

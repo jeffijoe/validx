@@ -2,8 +2,8 @@ import {
   validationContext,
   required,
   pattern,
-  IValidatorOptions
-} from '../../../lib'
+  IValidatorOptions,
+} from '../../../src'
 import { action, autorun } from 'mobx'
 import { inspect } from 'util'
 
@@ -23,21 +23,21 @@ const validation = validationContext(obj, {
   name: [required({ msg: 'Name is required' })],
   email: [
     required('Email is required'), // shorthand message parameter for the required validator.
-    pattern({ pattern: 'email', msg: 'That is not a valid email' })
+    pattern({ pattern: 'email', msg: 'That is not a valid email' }),
   ],
   age: [
     required('Age is required'),
     pattern({
       pattern: /\d/, // regex pattern for numbers
-      msg: 'Age must be a number'
+      msg: 'Age must be a number',
     }),
     // And a custom validator.
     (opts: IValidatorOptions<IObj>) => {
       // Validators return either true for success, and false (for the default error message)
       // or a string (for a custom error message)
       return opts.value >= 13 || 'You must be over 13 years of age to sign up.'
-    }
-  ]
+    },
+  ],
 })
 
 // Let's set up an autorun that will log whenever
@@ -49,7 +49,7 @@ autorun(() => {
   console.log('')
   console.log('-------- Validation Summary ---------')
   console.log('Bad field count: ', Object.keys(validation.errors).length)
-  Object.keys(validation.errors).map(key => {
+  Object.keys(validation.errors).map((key) => {
     // errors[key] is an observable array.
     // using slice to print them nicely in the console.
     console.log(

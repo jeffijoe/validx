@@ -123,7 +123,7 @@ export class ValidationContext implements IValidationContext {
    * @type {IValidationErrors}
    * @memberOf ValidationContext
    */
-  readonly errors: IValidationErrors
+  readonly errors!: IValidationErrors
 
   /**
    * Determines if the validation context is in a valid state (no errors)
@@ -132,7 +132,7 @@ export class ValidationContext implements IValidationContext {
    * @type {boolean}
    * @memberOf ValidationContext
    */
-  readonly isValid: boolean
+  readonly isValid!: boolean
 
   /**
    * Internal map of the errors.
@@ -141,7 +141,7 @@ export class ValidationContext implements IValidationContext {
    *
    * @memberOf ValidationContext
    */
-  private errorsMap: ObservableMap<string, string[]>
+  private errorsMap!: ObservableMap<string, string[]>
 
   /**
    * Initializes a new instance of ValidationContext.

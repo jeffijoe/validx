@@ -1,6 +1,5 @@
 import 'mocha'
-import { ValidationContext, pattern } from '../../src'
-import { expect } from 'chai'
+import { ValidationContext, pattern } from '../..'
 
 describe('patternValidator', () => {
   it('supports simple notation', () => {
@@ -10,12 +9,12 @@ describe('patternValidator', () => {
       {
         email1: [pattern('email', 'yo')],
         email2: [pattern('email')],
-        email3: [pattern('email')]
+        email3: [pattern('email')],
       }
     )
-    expect(c.errors['email1'][0]).to.equal('yo')
-    expect(c.errors['email2'][0]).to.equal('This is not a valid email')
-    expect(c.errors['email3']).to.equal(undefined)
+    expect(c.errors['email1'][0]).toEqual('yo')
+    expect(c.errors['email2'][0]).toEqual('This is not a valid email')
+    expect(c.errors['email3']).toBeUndefined()
   })
 
   it('validates emails', () => {
@@ -25,12 +24,12 @@ describe('patternValidator', () => {
       {
         email1: [pattern({ pattern: 'email', msg: 'yo' })],
         email2: [pattern({ pattern: 'email' })],
-        email3: [pattern({ pattern: 'email' })]
+        email3: [pattern({ pattern: 'email' })],
       }
     )
-    expect(c.errors['email1'][0]).to.equal('yo')
-    expect(c.errors['email2'][0]).to.equal('This is not a valid email')
-    expect(c.errors['email3']).to.equal(undefined)
+    expect(c.errors['email1'][0]).toEqual('yo')
+    expect(c.errors['email2'][0]).toEqual('This is not a valid email')
+    expect(c.errors['email3']).toBeUndefined()
   })
 
   it('validates urls', () => {
@@ -40,12 +39,12 @@ describe('patternValidator', () => {
       {
         url1: [pattern({ pattern: 'url', msg: 'yo' })],
         url2: [pattern({ pattern: 'url' })],
-        url3: [pattern({ pattern: 'url' })]
+        url3: [pattern({ pattern: 'url' })],
       }
     )
-    expect(c.errors['url1'][0]).to.equal('yo')
-    expect(c.errors['url2'][0]).to.equal('This is not a valid url')
-    expect(c.errors['url3']).to.equal(undefined)
+    expect(c.errors['url1'][0]).toEqual('yo')
+    expect(c.errors['url2'][0]).toEqual('This is not a valid url')
+    expect(c.errors['url3']).toBeUndefined()
   })
 
   it('validates regexp', () => {
@@ -55,11 +54,11 @@ describe('patternValidator', () => {
       {
         p1: [pattern({ pattern: /\d/, msg: 'yo' })],
         p2: [pattern({ pattern: /[a-z]/ })],
-        p3: [pattern({ pattern: /[a-z]/ })]
+        p3: [pattern({ pattern: /[a-z]/ })],
       }
     )
-    expect(c.errors['p1'][0]).to.equal('yo')
-    expect(c.errors['p2'][0]).to.match(/invalid/i)
-    expect(c.errors['p3']).to.equal(undefined)
+    expect(c.errors['p1'][0]).toEqual('yo')
+    expect(c.errors['p2'][0]).toMatch(/invalid/i)
+    expect(c.errors['p3']).toBeUndefined()
   })
 })

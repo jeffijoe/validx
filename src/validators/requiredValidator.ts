@@ -25,7 +25,7 @@ export const required = (rule?: IRequiredRule | string): IValidator<any> => {
     return () => true
   }
 
-  return opts => {
+  return (opts) => {
     return opts.value || opts.value === 0 // 0 is the only allowed falsy value.
       ? true
       : (typeof rule === 'string' ? rule : rule && rule.msg) || DEFAULT_MESSAGE

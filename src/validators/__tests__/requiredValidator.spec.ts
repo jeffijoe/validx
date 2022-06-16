@@ -1,6 +1,5 @@
 import 'mocha'
-import { ValidationContext, required } from '../../src'
-import { expect } from 'chai'
+import { ValidationContext, required } from '../..'
 
 describe('requiredValidator', () => {
   it('works', () => {
@@ -9,11 +8,11 @@ describe('requiredValidator', () => {
       { name: '', title: '' },
       {
         name: [required({ msg: 'yo' })],
-        title: [required('Title plz')]
+        title: [required('Title plz')],
       }
     )
-    expect(c.errors['name'][0]).to.equal('yo')
-    expect(c.errors['title'][0]).to.equal('Title plz')
+    expect(c.errors['name'][0]).toEqual('yo')
+    expect(c.errors['title'][0]).toEqual('Title plz')
   })
 
   it('can be disabled', () => {
@@ -22,10 +21,10 @@ describe('requiredValidator', () => {
       { name: '', title: '' },
       {
         name: [required({ msg: 'yo', required: false })],
-        title: [required('Title plz')]
+        title: [required('Title plz')],
       }
     )
-    expect(c.errors['name']).to.equal(undefined)
-    expect(c.errors['title'][0]).to.equal('Title plz')
+    expect(c.errors['name']).toBeUndefined()
+    expect(c.errors['title'][0]).toEqual('Title plz')
   })
 })
